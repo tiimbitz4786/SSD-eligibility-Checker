@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+5. Click **"Commit changes"** → **"Commit changes"**
+
+---
+
+### Let me also verify your repository structure
+
+Can you go to your GitHub repository's main page and take a screenshot showing all the files/folders? I want to make sure you have everything in the right place.
+
+Your repository should have this structure:
+```
+ssd-disability-quiz/
+├── app/
+│   ├── components/
+│   │   └── SSDQuiz.jsx
+│   ├── globals.css        ← THIS IS MISSING
+│   ├── layout.jsx
+│   └── page.jsx
+├── public/
+│   ├── logo.png
+│   ├── partner-left.png
+│   └── partner-right.png
+├── next.config.js
+├── package.json
+├── postcss.config.js
+└── tailwind.config.js
