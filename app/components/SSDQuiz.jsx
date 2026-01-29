@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect } from 'react';
 
 // Funnel Analytics Module
@@ -16,19 +17,19 @@ const FunnelAnalytics = {
     console.log('📊 Funnel Event:', entry);
     
     // In production, send to your analytics endpoint
-    // this.sendToServer(entry);
+    this.sendToServer(entry);
   },
   
   getSessionId() {
-    if (!window.sessionId) {
+    if (typeof window !== 'undefined' && !window.sessionId) {
       window.sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
     }
-    return window.sessionId;
+    return typeof window !== 'undefined' ? window.sessionId : 'server';
   },
   
   sendToServer(entry) {
-    // Zapier Webhook URL would go here
-    // fetch('YOUR_ZAPIER_WEBHOOK_URL', {
+    // REPLACE THIS URL WITH YOUR ZAPIER WEBHOOK URL
+    // fetch('https://hooks.zapier.com/hooks/catch/YOUR_ID/YOUR_KEY/', {
     //   method: 'POST',
     //   headers: { 'Content-Type': 'application/json' },
     //   body: JSON.stringify(entry)
@@ -89,7 +90,7 @@ export default function SSDQualificationQuiz() {
       question: 'Have you already applied for Social Security Disability?',
       subtext: 'We help at all stages of the process',
       options: [
-        { value: 'no', label: 'No, I haven\'t applied yet', icon: '🆕' },
+        { value: 'no', label: "No, I haven't applied yet", icon: '🆕' },
         { value: 'pending', label: 'Yes, my application is pending', icon: '⏳' },
         { value: 'denied', label: 'Yes, but I was denied', icon: '📝' }
       ]
@@ -156,7 +157,7 @@ export default function SSDQualificationQuiz() {
     });
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     
     FunnelAnalytics.track('lead_submitted', {
@@ -165,7 +166,29 @@ export default function SSDQualificationQuiz() {
       hasEmail: !!formData.email
     });
 
-    // In production, send to Zapier webhook
+    // UNCOMMENT AND ADD YOUR ZAPIER WEBHOOK URL HERE TO RECEIVE LEADS
+    // try {
+    //   await fetch('https://hooks.zapier.com/hooks/catch/YOUR_ID/YOUR_KEY/', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({
+    //       name: formData.name,
+    //       phone: formData.phone,
+    //       email: formData.email,
+    //       qualificationLevel: qualification?.level,
+    //       score: qualification?.score,
+    //       condition: answers.condition,
+    //       duration: answers.duration,
+    //       work_history: answers.work_history,
+    //       treatment: answers.treatment,
+    //       applied: answers.applied,
+    //       timestamp: new Date().toISOString()
+    //     })
+    //   });
+    // } catch (error) {
+    //   console.log('Error sending to Zapier:', error);
+    // }
+
     console.log('📧 Lead Data:', { ...formData, ...answers, qualification });
     
     setSubmitted(true);
@@ -180,8 +203,10 @@ export default function SSDQualificationQuiz() {
   };
 
   useEffect(() => {
-    window.addEventListener('beforeunload', handleExit);
-    return () => window.removeEventListener('beforeunload', handleExit);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', handleExit);
+      return () => window.removeEventListener('beforeunload', handleExit);
+    }
   }, [currentStep, answers]);
 
   const progress = ((currentStep + 1) / steps.length) * 100;
@@ -199,7 +224,7 @@ export default function SSDQualificationQuiz() {
           <div className="hidden md:block absolute left-0 top-0 h-full w-1/4 overflow-hidden opacity-90">
             <img 
               src="/partner-left.png" 
-              alt="Partner" 
+              alt="Attorney" 
               className="h-full w-full object-cover object-top"
               style={{ objectPosition: 'center top' }}
             />
@@ -209,7 +234,7 @@ export default function SSDQualificationQuiz() {
           <div className="hidden md:block absolute right-0 top-0 h-full w-1/4 overflow-hidden opacity-90">
             <img 
               src="/partner-right.png" 
-              alt="Partner" 
+              alt="Attorney" 
               className="h-full w-full object-cover object-top"
               style={{ objectPosition: 'center top' }}
             />
@@ -218,7 +243,7 @@ export default function SSDQualificationQuiz() {
 
           {/* Center content with logo */}
           <div className="relative z-10 max-w-4xl mx-auto px-6 py-6 md:py-8">
-            {/* Actual Logo Image */}
+            {/* Logo Image */}
             <div className="flex justify-center mb-4">
               <img 
                 src="/logo.png" 
@@ -333,7 +358,7 @@ export default function SSDQualificationQuiz() {
                   Based on your answers, our team should review your case
                 </p>
                 
-                {qualification?.factors.length > 0 && (
+                {qualification?.factors && qualification.factors.length > 0 && (
                   <div className="mt-4 flex flex-wrap justify-center gap-2">
                     {qualification.factors.map((factor, i) => (
                       <span key={i} className="px-3 py-1 bg-white/20 rounded-full text-sm">
@@ -445,7 +470,7 @@ export default function SSDQualificationQuiz() {
                 </div>
                 <div className="flex gap-3">
                   <span className="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">3</span>
-                  <span>We'll discuss your options at no cost</span>
+                  <span>We&apos;ll discuss your options at no cost</span>
                 </div>
               </div>
             </div>
@@ -453,11 +478,11 @@ export default function SSDQualificationQuiz() {
             <div className="flex items-center justify-center gap-4 text-slate-500">
               <span className="text-sm">Questions? Call us:</span>
               <a 
-                href="tel:+1XXXXXXXXXX" 
+                href="tel:+17166030000" 
                 className="font-bold text-lg"
                 style={{ color: '#2D8C3C' }}
               >
-                (XXX) XXX-XXXX
+                (716) 603-0000
               </a>
             </div>
           </div>
@@ -475,7 +500,7 @@ export default function SSDQualificationQuiz() {
       </footer>
 
       {/* Global Styles */}
-      <style>{`
+      <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;500;600;700&display=swap');
         
         @keyframes fadeInUp {
